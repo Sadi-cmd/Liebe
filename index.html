@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Liebe</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Cinzel:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --ink: #1a1612;
+      --parchment: #f5f0e8;
+      --ash: #c8bfb0;
+      --ember: #8b6f5e;
+      --ghost: #e8e0d4;
+      --deep: #0d0b09;
+      --fog: rgba(245, 240, 232, 0.04);
+    }
+
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      font-size: 18px;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--deep);
+      color: var(--parchment);
+      font-family: 'EB Garamond', Georgia, serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      cursor: default;
+    }
+
+    /* Grain overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.06'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.35;
+    }
+
+    /* Vignette */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse at center, transparent 40%, rgba(5, 4, 3, 0.75) 100%);
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    /* ── COVER ── */
+    .cover {
+      position: relative;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .cover-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 40%, rgba(82, 56, 40, 0.18) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 20% 80%, rgba(60, 40, 28, 0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 30% at 80% 20%, rgba(45, 32, 22, 0.1) 0%, transparent 60%);
+    }
+
+    /* Floating dust particles */
+    .particles {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .particle {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      background: var(--ash);
+      border-radius: 50%;
+      animation: drift linear infinite;
+      opacity: 0;
+    }
+
+    @keyframes drift {
+      0%   { transform: translateY(100vh) translateX(0px); opacity: 0; }
+      10%  { opacity: 0.4; }
+      90%  { opacity: 0.15; }
+      100% { transform: translateY(-10vh) translateX(30px); opacity: 0; }
+    }
+
+    .cover-ornament {
+      font-family: 'Cinzel', serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.45em;
+      color: var(--ember);
+      text-transform: uppercase;
+      margin-bottom: 3rem;
+      opacity: 0;
+      animation: fadeUp 1.4s ease forwards 0.4s;
+    }
+
+    .cover-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(5rem, 18vw, 13rem);
+      font-weight: 300;
+      letter-spacing: -0.02em;
+      line-height: 0.9;
+      color: var(--parchment);
+      opacity: 0;
+      animation: fadeUp 1.6s ease forwards 0.7s;
+      position: relative;
+    }
+
+    .cover-title::after {
+      content: 'Liebe';
+      position: absolute;
+      inset: 0;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(200, 191, 176, 0.12);
+      transform: translate(3px, 3px);
+      z-index: -1;
+    }
+
+    .cover-subtitle {
+      font-family: 'EB Garamond', serif;
+      font-style: italic;
+      font-size: 0.95rem;
+      color: var(--ash);
+      letter-spacing: 0.12em;
+      margin-top: 2.5rem;
+      opacity: 0;
+      animation: fadeUp 1.6s ease forwards 1s;
+    }
+
+    .cover-line {
+      width: 1px;
+      height: 80px;
+      background: linear-gradient(to bottom, transparent, var(--ember), transparent);
+      margin: 3rem auto 0;
+      opacity: 0;
+      animation: fadeUp 1.6s ease forwards 1.3s;
+    }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Cinzel', serif;
+      font-size: 0.5rem;
+      letter-spacing: 0.5em;
+      color: var(--ember);
+      text-transform: uppercase;
+      opacity: 0;
+      animation: fadeUp 1.6s ease forwards 2s, pulse 3s ease-in-out infinite 3s;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── STORY CONTAINER ── */
+    .story {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 8rem 2.5rem 10rem;
+      position: relative;
+    }
+
+    /* Left margin rule */
+    .story::before {
+      content: '';
+      position: fixed;
+      left: calc(50% - 380px);
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: linear-gradient(to bottom, transparent 5%, rgba(139, 111, 94, 0.08) 30%, rgba(139, 111, 94, 0.08) 70%, transparent 95%);
+      pointer-events: none;
+    }
+
+    /* Opening epigraph */
+    .epigraph {
+      text-align: center;
+      margin-bottom: 7rem;
+      padding: 0 1rem;
+      opacity: 0;
+      animation: fadeUp 1.2s ease forwards 0.2s;
+    }
+
+    .epigraph-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 1.35rem;
+      font-weight: 300;
+      color: var(--ash);
+      line-height: 1.7;
+    }
+
+    .epigraph-text strong {
+      font-style: normal;
+      font-weight: 400;
+      color: var(--parchment);
+    }
+
+    .epigraph-rule {
+      display: block;
+      width: 40px;
+      height: 1px;
+      background: var(--ember);
+      margin: 1.8rem auto 0;
+      opacity: 0.6;
+    }
+
+    /* Section separator */
+    .separator {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 4.5rem 0;
+      gap: 1rem;
+      color: var(--ember);
+      opacity: 0.5;
+    }
+
+    .separator::before,
+    .separator::after {
+      content: '';
+      flex: 1;
+      max-width: 60px;
+      height: 1px;
+      background: currentColor;
+    }
+
+    .separator-glyph {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+    }
+
+    /* Paragraphs */
+    p {
+      font-family: 'EB Garamond', serif;
+      font-size: 1.08rem;
+      line-height: 1.95;
+      color: rgba(245, 240, 232, 0.82);
+      margin-bottom: 1.6rem;
+      font-weight: 400;
+      text-align: justify;
+      hyphens: auto;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.9s ease, transform 0.9s ease;
+    }
+
+    p.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    p em {
+      font-style: italic;
+      color: rgba(245, 240, 232, 0.95);
+    }
+
+    p strong {
+      font-weight: 500;
+      color: var(--parchment);
+    }
+
+    /* Drop cap for first paragraph */
+    .dropcap::first-letter {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 4.8rem;
+      font-weight: 300;
+      float: left;
+      line-height: 0.78;
+      margin-right: 0.08em;
+      margin-top: 0.1em;
+      color: var(--ember);
+      padding-right: 0.05em;
+    }
+
+    /* Spoken dialogue */
+    .dialogue {
+      font-style: italic;
+      color: rgba(245, 240, 232, 0.92);
+    }
+
+    /* Standalone short lines */
+    .standalone {
+      text-align: center;
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 1.1rem;
+      color: var(--ash);
+      margin: 3.2rem 0;
+    }
+
+    /* Final lines */
+    .final-lines {
+      margin-top: 5rem;
+      text-align: center;
+    }
+
+    .final-lines p {
+      text-align: center;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem;
+      font-style: italic;
+      color: var(--ash);
+      margin-bottom: 0.6rem;
+      line-height: 1.7;
+    }
+
+    .final-lines .closing {
+      font-size: 1.3rem;
+      color: var(--parchment);
+      font-style: normal;
+      margin-top: 1.2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .final-lines .given {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem;
+      font-style: italic;
+      font-weight: 300;
+      color: var(--ember);
+      letter-spacing: 0.04em;
+      display: block;
+      margin: 2rem 0 0.5rem;
+    }
+
+    /* Colophon */
+    .colophon {
+      text-align: center;
+      margin-top: 8rem;
+      padding-top: 4rem;
+      border-top: 1px solid rgba(139, 111, 94, 0.18);
+      opacity: 0;
+      animation: fadeUp 1.4s ease forwards;
+    }
+
+    .colophon.visible {
+      opacity: 1;
+    }
+
+    .colophon-title {
+      font-family: 'Cinzel', serif;
+      font-size: 0.6rem;
+      letter-spacing: 0.5em;
+      color: var(--ember);
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+
+    .colophon-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 0.95rem;
+      color: rgba(200, 191, 176, 0.45);
+      line-height: 1.8;
+    }
+
+    .colophon-ornament {
+      display: block;
+      margin: 2rem auto 0;
+      width: 30px;
+      height: 1px;
+      background: rgba(139, 111, 94, 0.35);
+    }
+
+    /* Ambient glow that follows scroll */
+    .ambient {
+      position: fixed;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(100, 68, 48, 0.06) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+      transition: transform 0.8s ease, top 0.8s ease, left 0.8s ease;
+      transform: translate(-50%, -50%);
+    }
+
+    /* Responsive */
+    @media (max-width: 700px) {
+      html { font-size: 16px; }
+      .story { padding: 5rem 1.5rem 7rem; }
+      .story::before { display: none; }
+      .cover-title { font-size: clamp(4rem, 22vw, 8rem); }
+    }
+
+    /* Selection */
+    ::selection {
+      background: rgba(139, 111, 94, 0.3);
+      color: var(--parchment);
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-track { background: var(--deep); }
+    ::-webkit-scrollbar-thumb { background: var(--ember); border-radius: 2px; }
+  </style>
+</head>
+<body>
+
+  <div class="ambient" id="ambient"></div>
+
+  <!-- Particles -->
+  <div class="particles" id="particles"></div>
+
+  <!-- ── COVER ── -->
+  <section class="cover">
+    <div class="cover-bg"></div>
+    <div class="cover-ornament">A Story</div>
+    <h1 class="cover-title">Liebe</h1>
+    <p class="cover-subtitle">love has and takes different kinds of forms</p>
+    <div class="cover-line"></div>
+    <span class="scroll-hint">Continue</span>
+  </section>
+
+  <!-- ── STORY ── -->
+  <main class="story">
+
+    <!-- Opening question -->
+    <div class="epigraph">
+      <p class="epigraph-text"><strong>"What does love mean?"</strong><br>Someone asks.</p>
+      <span class="epigraph-rule"></span>
+    </div>
+
+    <p class="dropcap">He was standing by the window, staring at the never-ending crowd walking through the streets, kids playing in the park, couples holding hands, a parent and a child. For a moment he heard the question, he hadn't answered just yet. Not for the fact that he doesn't know the answer, but for the fact that he knew <em>too</em> much to even give an answer. He knew too much that that "too much" was all about her.</p>
+
+    <p>He had loved her just as the rain unconditionally, inevitably falls in the ground, falling, falling, and then silence just after it fell, and the ground not knowing it had been touched at all.</p>
+
+    <p>He had sat across the table from her where the coffee went cold and she didn't know, because she was talking about something she loved, be it her favorite book, her favorite season, her hobbies, foods she always liked to cook. He completely forgot that he was human, a person with a body, a person that feels hunger, a person that has a name.</p>
+
+    <p>He was all ears, only the willingness to receive everything she gave without asking back for something in return. Having the thought of wanting to sit on that chair and let the coffee go colder and colder and listen to her talk, it was the only thing he ever wanted.</p>
+
+    <p class="standalone">He had not said this.</p>
+
+    <p>This is also love. The swallowing of it. The careful, daily discipline of wanting enormously and showing little to nothing, because you know that the full weight of it, if it was dropped on someone, it wouldn't land as a gift. It would land as a burden. And he refused — he had come to the decision not to, quietly, and it cost half of him — he refused to become something she had to carry.</p>
+
+    <div class="separator"><span class="separator-glyph">—</span></div>
+
+    <p>She had told him once, not unkindly — she was never that kind of person. What she is was something of the exact opposite, and that made it more painful, that she was not ready. That there was something in her that hadn't healed just yet, time doesn't actually heal wounds, scars remain, and he understood.</p>
+
+    <p>He did understand, that was the part no one would probably believe when he would tell.</p>
+
+    <p>He understood that some people arrive like they arrive at a foreign country, learning the language, slowly. Needing the time to adjust, and discovering places that felt new. She wasn't refusing him, she was not yet fluent. Both are different things. And the difference mattered to him more than the outcome.</p>
+
+    <p>But understanding things doesn't mean that it's weightless. He learned that too by chance, holding the truth gently while he still felt it pressing against the inside of his ribs every morning before he's fully awake, waking up everyday in the morning before the brain and body takes in full control until he remembers to be the person who has to be fine, who must be fine.</p>
+
+    <p class="standalone">He was fine.</p>
+
+    <div class="separator"><span class="separator-glyph">—</span></div>
+
+    <p>There are men who love a woman for what she could give them. He wasn't this kind of man, though he had tried to be, once, in a different life, when trying felt safer than feeling. He was the other kind. The worse, perhaps. The one who loves without even thinking of expecting anything in return.</p>
+
+    <p>He loved the way she laughed before the sound came, he loved the silence she makes when she was thinking, a silence with shape and texture, a silence that asked nothing of him. He loved her stubbornness and her softness, and how the way she could easily be both at once, and he loved the version of her that was tired. He loved the version of her that was difficult. He loved the version she didn't show people, the one that surfaced sometimes at the edges of long evenings, the one that was quieter and less curated and somehow more entirely herself than any version she offered the world.</p>
+
+    <p>He loved her not because she was available, nor he loved her because she was easy, or convenient, or because she fit neatly into the shape of something he had imagined. He loved her because she was her. Because she was a specific and irreplaceable arrangement of a person that the world had only made once, and he had been close enough to see it clearly, and once you have seen a thing like that clearly, there is no way in hell you can unsee it. You cannot go back in time to reach <em>before</em>. There is no before anymore. There is only the after, which is all the days you live inside the knowledge of her, the long unending after.</p>
+
+    <div class="separator"><span class="separator-glyph">—</span></div>
+
+    <p>Some nights it was difficult.</p>
+
+    <p>Some nights difficult was not the right word and he had no other.</p>
+
+    <p>He would lie in the dark and feel it — not as a thought but as a physical thing, a pressure behind the sternum, a weight distributed across the chest with the cruelty of something that knows exactly it should be that makes the breathing slightly harder than it should be. Not impossible. Just harder. Just enough that every inhale was a small reminder. He would try the usual remedies — shifting position, opening the window, drinking water, reading something, all the small mechanical dignities of a person attempting to be fine — and none of it would touch it, because it was not that kind of thing. It was not a thing that responded to remedies. It was a thing that simply had to be endured, the way weather is endured, the way winter is endured, by people who live in climates that do not apologize for themselves.</p>
+
+    <p>He would lie there and he would think about the geometry of it. The precise angle at which he had fallen and the equal and opposite angle at which she had not. He would think about how love, when it is not returned, does not go away. It doesn't diminish the way pain diminishes. It doesn't scar over. It doesn't transform into something more manageable, the way people who had never felt it properly always seemed to believe it would. It just stays, and it only gets stronger every single day. It eventually found itself a room in you and it lives there, and it pays no rent, and it moves the furniture without asking, and you learn to navigate around it. You learn which floorboards creak. You learn to keep the door closed when people come over so they do not see how much space it takes up, how completely it has occupied what used to be available, how little room it leaves for anything that is not also, somehow, her.</p>
+
+    <p>He thought about who he had been before her — not a better man, not a worse one, just a man with more available space. A man who could walk into a room and not immediately locate her in it. A man who can sit with silence without it filling up with the frequency of her voice, the rhythm of the way she said his name when she wasn't thinking about it — not the careful version, not the version she used in public, but the reflexive one, the one that came out when she turned to tell him something without thinking first. He could not remember, actually, what he had been before he knew that version of his own name. He knew that was a strange thing to mourn. But he mourned it anyway.</p>
+
+    <p>This frightened him sometimes. The totality of it. The way love, real love — the type of love you don't construct but stumble into, the kind that isn't interested in your plans or your readiness or your carefully maintained ideas about what you deserve — rearranges you without your consent and does not offer to rearrange you back. He had not signed anything. He had not agreed to be changed at the molecular level by a woman who did not know she was doing it, who would be horrified and shocked or flabbergasted to know she was doing it, who was herself only trying to heal and did not need the additional weight of his quiet, disciplined, interminable devotion pressing on her from outside. He thought about this often.</p>
+
+    <p class="standalone">Every day he decided.</p>
+    <p class="standalone" style="margin-top: -2rem;">He did not always know why.</p>
+
+    <p>He was not bitter because bitterness required him to believe she owed him something, and she didn't. You are not owed a person. You are not owed their readiness, or their timing, or their heart simply because you have offered yours openly and completely and without condition. The offering doesn't create a debt.</p>
+
+    <p class="standalone">He knew of it.</p>
+
+    <p>What he felt instead of bitterness was something without a clean name in any language he had tried. He had tried several. Mandarin came closest — it always came closest, Mandarin, with its long words built for feelings that other languages left unnamed — but even Mandarin ran out eventually. Even Mandarin could not fully hold this particular thing, which was a grief with no body, a mourning for something that had never existed and therefore had no date of death, no moment of loss to point to, no grave to visit. Just the continuous, low, almost subsonic hum of it. Just the frequency. A loss that looked, from the outside, like nothing at all.</p>
+
+    <p>He carried it, just like the way you carry your own body, carrying it until you no longer feel the gravity pressing down on you, until you set it down for a moment, and then you feel the sudden and terrible lightness where the weight was, and you understand that the absence of the burden is itself a kind of grief, because the burden had become the proof that it was real, that you felt it, that you were someone who had loved someone truly enough to have it hollow you out a little.</p>
+
+    <p>He had stopped fighting it. Fighting it had been exhausting and had changed nothing except to exhaust him, and he needed the energy for other things — for being a person, for showing up, for continuing to be someone she did not have to worry about.</p>
+
+    <p>Being the person she didn't have to worry about, he was very, very careful of.</p>
+
+    <p>This was the last and greatest form his love had taken, and perhaps the most invincible, and perhaps the one that cost him most: the daily labor of loving her without letting it become her problem. Of caring for her so completely that it had become as easy as breathing. Of being present without feeling the weight of it. Of being warm without being need. Of standing close enough to catch her if she fell and far enough so she can never felt watched. It was an exhausting distance to maintain. He maintained it anyway. He maintained it because she was trying to heal, and he would not be another thing she had to manage while she did. He would not be that. Whatever else he was, he would not be that.</p>
+
+    <div class="separator"><span class="separator-glyph">—</span></div>
+
+    <p><span class="dialogue">"Love has and takes different kinds of forms,"</span> he finally says.</p>
+
+    <p>The person who asked is looking at him, waiting for more. He looks back at the window. He thinks of her. He thinks of the way she said his name — his heart always fluttered when she calls him by his name, he wasn't able to find the answer why, but he still loved it anyway — with something in it he couldn't read and did not allow himself to guess at, because guessing was a door and he knew what lived behind it.</p>
+
+    <p>He thinks of how he will love her tomorrow the same as he loves her today, and the day after, and all the days stacked behind that one going as far as he can see, each one asking him the same quiet question and each one receiving the same quiet answer.</p>
+
+    <p class="standalone" style="font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; color: var(--parchment); letter-spacing: 0.04em;">Yes. Still. Even now. Even like this.</p>
+
+    <p>Not because it is romantic. Not because he is waiting for the happy ending to arrive, holding his breath for a resolution that may never come. Not because he has confused endurance with hope, or longing with loyalty, or the inability to stop with the nobility of continuing. He knows the difference. He is not confused.</p>
+
+    <p>He loves her because she exists, someone irreplaceable, and because the world he lives in is better for containing her, because some feelings — the real ones — do not require the reciprocity to be true. They only require you to be honest enough to hold them. To not make them smaller than they are just because smaller would be easier to explain.</p>
+
+    <p>He turns from the window.</p>
+
+    <p><span class="dialogue">"It doesn't always look like what you imagine,"</span> he says. <span class="dialogue">"Sometimes it just looks like showing up. Even when no one asks you to. Even when no one knows."</span></p>
+
+    <p>He does not say: even when it undoes you, slowly, in the small hours, in the quiet spaces between one ordinary moment and the next.</p>
+
+    <p>He does not say: even when you have made peace with the fact that loving someone and being loved back are two separate countries, and you have chosen to live in one of them because it is the only one that feels like home, and home is home even when it costs you everything to stay.</p>
+
+    <p class="standalone">He doesn't say any of it.</p>
+
+    <div class="final-lines">
+      <p>It is very large.</p>
+      <p>He breathes.</p>
+      <p>Outside, the afternoon continues.</p>
+      <p>Somewhere, without knowing it, she is there.</p>
+      <p>He closes his eyes.</p>
+      <p class="closing">That is enough.</p>
+      <p>It has to be enough.</p>
+      <p>It is the only thing left, and it is enough, and he will get up tomorrow and it will still be enough, and the day after that, and all the days that come after, each one a quiet act of love that she will never see, each one chosen freely, each one costing something real, each one given anyway —</p>
+      <span class="given">Given anyway.</span>
+      <p style="margin-top: 1.5rem; color: rgba(200,191,176,0.6); font-size: 0.95rem;">Because that is what it means.</p>
+      <p style="color: rgba(200,191,176,0.6); font-size: 0.95rem;">That is what it has always meant.</p>
+      <p style="color: rgba(200,191,176,0.6); font-size: 0.95rem;">That is the only answer he has ever had.</p>
+    </div>
+
+    <!-- Colophon -->
+    <div class="colophon" id="colophon">
+      <p class="colophon-title">Fin</p>
+      <p class="colophon-text">
+        Written with everything.<br>
+        Until we meet again.
+      </p>
+      <span class="colophon-ornament"></span>
+    </div>
+
+  </main>
+
+  <script>
+    // ── Particles ──
+    const container = document.getElementById('particles');
+    for (let i = 0; i < 28; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      p.style.left = Math.random() * 100 + '%';
+      p.style.width = (Math.random() * 1.5 + 0.5) + 'px';
+      p.style.height = p.style.width;
+      p.style.animationDuration = (Math.random() * 20 + 18) + 's';
+      p.style.animationDelay = (Math.random() * 20) + 's';
+      p.style.opacity = Math.random() * 0.3;
+      container.appendChild(p);
+    }
+
+    // ── Scroll reveal ──
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('p, .colophon').forEach(el => observer.observe(el));
+
+    // ── Ambient glow follows scroll ──
+    const ambient = document.getElementById('ambient');
+    window.addEventListener('scroll', () => {
+      const scrollY = window.scrollY;
+      const centerX = window.innerWidth / 2;
+      ambient.style.left = centerX + 'px';
+      ambient.style.top = (scrollY + window.innerHeight * 0.5) + 'px';
+    }, { passive: true });
+
+    // ── Stagger paragraph reveals ──
+    let delay = 0;
+    document.querySelectorAll('.story p').forEach(p => {
+      p.style.transitionDelay = '0s';
+    });
+  </script>
+</body>
+</html>
